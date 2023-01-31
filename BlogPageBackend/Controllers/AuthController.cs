@@ -8,6 +8,7 @@ namespace BlogPageBackend.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+
         [HttpPost("register")]
         public IActionResult Register() //RegistrationModel model
         {

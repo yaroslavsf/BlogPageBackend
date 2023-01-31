@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using BlogPageBackend.Data;
 using BlogPageBackend.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using BlogPageBackend.Services;
 
 namespace BlogPageBackend.Controllers
 {
@@ -14,31 +15,29 @@ namespace BlogPageBackend.Controllers
     [ApiController]
     public class PostsController : ControllerBase
     {
-        private readonly BlogDbContext _context;
+        private readonly IPostService service;
 
-        public PostsController(BlogDbContext context)
+        public PostsController(IPostService service)
         {
-            _context = context;
+            this.service = service;
         }
 
         // GET: api/
         [HttpGet("get_all")]
-        public async Task<ActionResult<IEnumerable<Post>>> GetPost()
+        public ActionResult<IEnumerable<Post>> GetPosts()
         {
-            return await _context.Post.ToListAsync();
+            return service.GetAllPosts();
         }
         // POST: api/Posts
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost("create_post")]
-        public async Task<ActionResult<Post>> PostPost(Post post)
+        [HttpPost("create_post_by_author/{authorId}")]
+        public ActionResult<Post> PostPost(int authorId, Post post)
         {
-            _context.Post.Add(post);
-            await _context.SaveChangesAsync();
-
+            service.AddPost(authorId, post);
             return CreatedAtAction("GetPost", new { id = post.Id }, post);
         }
 
-        // DELETE: api/Posts/5
+        /*// DELETE: api/Posts/5
         [HttpDelete("delete_post/{id}")]
         public async Task<IActionResult> DeletePost(int id)
         {
@@ -52,11 +51,8 @@ namespace BlogPageBackend.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
+        }*/
 
-        private bool PostExists(int id)
-        {
-            return _context.Post.Any(e => e.Id == id);
-        }
+
     }
 }

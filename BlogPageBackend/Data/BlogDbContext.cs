@@ -19,14 +19,9 @@ namespace BlogPageBackend.Data
             modelBuilder.Entity<Post>();
             modelBuilder.Entity<Comment>();
         }
-        public DbSet<User>? Users;
-        public DbSet<Role>? Roles;
-        public DbSet<Post>? Posts;
-        public DbSet<Comment>? Comments;
-        public DbSet<Like>? Likes;
-        public DbSet<BlogPageBackend.Data.Entities.User> User { get; set; }
-        public DbSet<BlogPageBackend.Data.Entities.Post> Post { get; set; }
-        public DbSet<BlogPageBackend.Data.Entities.Like> Like { get; set; }
-        public DbSet<BlogPageBackend.Data.Entities.Comment> Comment { get; set; }
+        public DbSet<User> User { get; set; }
+        public DbSet<Post> Post { get; set; }
+        public DbSet<Like> Like { get; set; }
+        public DbSet<Comment> Comment { get; set; }
     }
 }

@@ -13,16 +13,16 @@ namespace BlogPageBackend.Data.Repositories
 
         public List<User> GetAll()
         {
-            return context.Users.ToList();
+            return context.User.ToList();
         }
 
         public User GetUserByID(int id)
         {
-            return context.Users.Find(id);
+            return context.User.Find(id);
         }
         public void InsertUser(User user)
         {
-            context.Users.Add(user);
+            context.User.Add(user);
         }
     }
 }

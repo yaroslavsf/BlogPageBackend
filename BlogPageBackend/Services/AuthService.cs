@@ -1,6 +1,10 @@
-﻿namespace BlogPageBackend.Services
+﻿using BlogPageBackend.Data.Repositories;
+
+namespace BlogPageBackend.Services
 {
     public class AuthService
     {
+        private readonly IUserRepository userRepository;
+
     }
 }

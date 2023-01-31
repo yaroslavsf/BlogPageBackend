@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using BlogPageBackend.Data;
 using BlogPageBackend.Data.Entities;
+using BlogPageBackend.Data.Repositories;
+using BlogPageBackend.Services;
 
 namespace BlogPageBackend.Controllers
 {
@@ -14,75 +16,34 @@ namespace BlogPageBackend.Controllers
     [ApiController]
     public class LikesController : ControllerBase
     {
-        private readonly BlogDbContext _context;
+        private readonly ILikeService service;
 
-        public LikesController(BlogDbContext context)
+        public LikesController(ILikeService service)
         {
-            _context = context;
+            this.service = service;
         }
 
 
         // GET: api/Likes/5
         [HttpGet("likes_of_post/{id}")]
-        public async Task<ActionResult<Like>> GetLikesByPost(int id)
+        public ActionResult<List<Like>> GetLikesByPost(int id)
         {
-            var like = await _context.Like.FindAsync(id);
-
-            if (like == null)
-            {
-                return NotFound();
-            }
-
-            return like;
+            var likes = service.GetLikesByPostId(id);
+            return likes;
         }
 
-        // GET: api/Likes/5
-        [HttpGet("likes_of_user/{id}")]
-        public async Task<ActionResult<Like>> GetLikesByUser(int id)
-        {
-            var like = await _context.Like.FindAsync(id);
-
-            if (like == null)
-            {
-                return NotFound();
-            }
-
-            return like;
-        }
 
         // PUT: api/Likes/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("create_like_under_post/{id}")]
-        public async Task<IActionResult> PutLike(int id, Like like)
+        [HttpPost("create_like_under_post/{postId}/by_user/{userId}")]
+        public ActionResult<Like> PostLike(int postId, int userId, Like like)
         {
-            if (id != like.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(like).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!LikeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            service.AddLikeWithPostIdAndAuthorId(postId, userId, like);
+            return CreatedAtAction("GetLike", new { id = like.Id }, like);
         }
 
         // DELETE: api/Likes/5
-        [HttpDelete("delete_like_under_post/{id}")]
+        /*[HttpDelete("delete_like_under_post/{id}")]
         public async Task<IActionResult> DeleteLike(int id)
         {
             var like = await _context.Like.FindAsync(id);
@@ -95,11 +56,6 @@ namespace BlogPageBackend.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool LikeExists(int id)
-        {
-            return _context.Like.Any(e => e.Id == id);
-        }
+        }*/
     }
 }

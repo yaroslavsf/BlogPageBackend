@@ -1,8 +1,9 @@
 ﻿using BlogPageBackend.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlogPageBackend.Data.Repositories
 {
-    public class CommentRepository
+    public class CommentRepository : IUserRepository
     {
         private readonly BlogDbContext context;
 
@@ -13,27 +14,28 @@ namespace BlogPageBackend.Data.Repositories
 
         public List<Comment> GetAll()
         {
-            return context.Comments.ToList();
+            return context.Comment.ToList();
         }
 
         public Comment GetCommentByID(int id)
         {
-            return context.Comments.Find(id);
+            return context.Comment.Find(id);
         }
 
         public List<Comment> GetCommentsByUserId(int userId)
         {
-            return (List<Comment>)context.Comments.Where(comment => comment.AuthorId.Equals(userId));
+            return (List<Comment>)context.Comment.Where(comment => comment.AuthorId.Equals(userId));
         }
 
         public List<Comment> GetCommentsByPostId(int postId)
         {
-            return (List<Comment>)context.Comments.Where(comment => comment.PostId.Equals(postId));
+            return (List<Comment>)context.Comment.Where(comment => comment.PostId.Equals(postId));
         }
 
         public void InsertComment(Comment comment)
         {
-            context.Comments.Add(comment);
+            context.Comment.Add(comment);
+            context.SaveChanges();
         }
     }
 }

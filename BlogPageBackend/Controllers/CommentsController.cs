@@ -2,6 +2,7 @@
 using BlogPageBackend.Data;
 using BlogPageBackend.Data.Entities;
 using Microsoft.EntityFrameworkCore;
+using BlogPageBackend.Services;
 
 namespace BlogPageBackend.Controllers
 {
@@ -9,75 +10,33 @@ namespace BlogPageBackend.Controllers
     [ApiController]
     public class CommentsController : ControllerBase
     {
-        private readonly BlogDbContext _context;
-
-        public CommentsController(BlogDbContext context)
+        private readonly ICommentService service;
+        public CommentsController(ICommentService service)
         {
-            _context = context;
-        }
-
-
-        // GET: api/Comments/5
-        [HttpGet("comments_of_user{id}")]
-        public async Task<ActionResult<Comment>> GetCommentByUserId(int id)
-        {
-            var comment = await _context.Comment.FindAsync(id);
-
-            if (comment == null)
-            {
-                return NotFound();
-            }
-
-            return comment;
+            this.service = service;
         }
 
         // GET: api/Comments/5
-        [HttpGet("comments_of_post{id}")]
-        public async Task<ActionResult<Comment>> GetCommentByPostId(int id)
+        [HttpGet("comments_of_post/{id}")]
+        public ActionResult<IEnumerable<Comment>> GetCommentsByPostId(int id)
         {
-            var comment = await _context.Comment.FindAsync(id);
-
-            if (comment == null)
-            {
-                return NotFound();
-            }
-
-            return comment;
+            var comments = service.GetCommentsByPostId(id);
+            return comments;
         }
 
-        // PUT: api/Comments/5
+        // POST: api/Test
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("create_comment_of_post{id}")]
-        public async Task<IActionResult> PutComment(int id, Comment comment)
+        [HttpPost("create_comment_of_post/{postId}/by_user/{userId}")]
+        public ActionResult<Comment> PostComment(int postId, int userId, Comment comment)
         {
-            if (id != comment.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(comment).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CommentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            service.AddCommentWithPostIdAndAuthorId(postId, userId, comment);
+            return CreatedAtAction("GetPost", new { id = comment.Id }, comment);
         }
+
+
 
         // DELETE: api/Comments/5
-        [HttpDelete("delete_comment_of_post{id}")]
+        /*[HttpDelete("delete_comment/{id}")]
         public async Task<IActionResult> DeleteComment(int id)
         {
             var comment = await _context.Comment.FindAsync(id);
@@ -90,11 +49,11 @@ namespace BlogPageBackend.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
+        }*/
 
-        private bool CommentExists(int id)
-        {
-            return _context.Comment.Any(e => e.Id == id);
-        }
+        /* private bool CommentExists(int id)
+         {
+             return _context.Comment.Any(e => e.Id == id);
+         }*/
     }
 }
